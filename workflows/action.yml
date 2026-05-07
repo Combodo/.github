@@ -7,6 +7,10 @@ on:
   issues:
     types:
       - opened
+  workflow_call:
+    secrets:
+      PR_AUTOMATICALLY_ADD_TO_PROJECT:
+        required: true
 
 jobs:
   add-to-project:
