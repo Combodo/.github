@@ -1,5 +1,6 @@
 name: "Enhancement suggestion"
-description: "Suggest an improvement to this module/extension."
+description: "Suggest an improvement to this module, with a clear description of the expected behavior and the benefits it would bring. The more users are affected and the greater is the impact, the more likely this improvement will be accepted. If you identified a bug and have an improvement 
+proposition, please use the 'Bug report' template instead."
 type: feature
 body:
   - type: markdown
