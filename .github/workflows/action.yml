@@ -21,11 +21,21 @@ jobs:
         id: check-membership
         run: |
           ORG="Combodo"
-          AUTHOR=$(jq -r .pull_request.user.login "$GITHUB_EVENT_PATH")
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            AUTHOR=$(jq -r .pull_request.user.login "$GITHUB_EVENT_PATH")
+          else
+            AUTHOR=$(jq -r .issue.user.login "$GITHUB_EVENT_PATH")
+          fi
           RESPONSE=$(curl -s -o /dev/null -w "%{http_code}" -H "Authorization: token ${{ secrets.PR_AUTOMATICALLY_ADD_TO_PROJECT }}" \
             "https://api.github.com/orgs/$ORG/members/$AUTHOR")
           if [ "$RESPONSE" == "404" ]; then
-            echo "project_url=https://github.com/orgs/Combodo/projects/5" >> $GITHUB_ENV
+            ISSUE_BODY=$(jq -r .issue.body "$GITHUB_EVENT_PATH")
+            WILLING_TO_PR=$(echo "$ISSUE_BODY" | awk '/^### Are you willing to create \(at a later stage\) a PR for that\?/{getline; while ($0 ~ /^[[:space:]]*$/) {getline}; print; exit}')
+            if [ "$WILLING_TO_PR" = "Yes" ]; then
+              echo "project_url=https://github.com/orgs/Combodo/projects/5" >> $GITHUB_ENV
+            else
+              echo "project_url=https://github.com/orgs/Combodo/projects/7" >> $GITHUB_ENV
+            fi
             echo "is_member=false" >> $GITHUB_ENV
           else
             echo "project_url=https://github.com/orgs/Combodo/projects/4" >> $GITHUB_ENV
